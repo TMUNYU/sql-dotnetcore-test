@@ -5,6 +5,8 @@ using Orders.Api.Services.Exceptions;
 using Orders.Api.Services.Models.DomainModels;
 using Orders.Api.Services.Services.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Orders.Api.Services.Services.Implementations
@@ -36,7 +38,7 @@ namespace Orders.Api.Services.Services.Implementations
 
             var customerDetails = await _customerDetailsRepository.GetCustomerDetailsByEmailAsync(email);
 
-            ThrowIfCustomerIdsDoNotMatch(customerDetails.CustomerId, customerId, email);
+            ThrowIfCustomerIdsDoNotMatch(customerDetails?.CustomerId, customerId, email);
 
             var orderDetails = await _ordersRepository.GetOrdersByCustomerIdLastestOnlyAsync(customerId);
 
@@ -56,8 +58,55 @@ namespace Orders.Api.Services.Services.Implementations
 
             return new OrderSummary()
             {
-                OrderItems = MapOderItems()
+                OrderDate = EnsureDateFormate(orderDetails.Orderdate.GetValueOrDefault()),
+                DeliveryExpected = EnsureDateFormate(orderDetails.Deliveryexpected.GetValueOrDefault()),
+                OrderNumber = orderDetails.Orderid,
+                DeliveryAddress = ConstructAddress(customerDetails),
+                OrderItems = MapOrderItems(orderDetails)
             };
+        }
+
+        private string EnsureDateFormate(DateTime orderdate)
+        {
+            return orderdate.ToString("dd-MM-yyyy");
+        }
+
+        private string ConstructAddress(CustomerDetails customerDetails)
+        {
+            var addressFragment = new[]
+            {
+                customerDetails.HouseNumber,
+                customerDetails.Street,
+                customerDetails.Town,
+                customerDetails.Postcode
+            }.Where(x => !string.IsNullOrWhiteSpace(x));
+
+            return string.Join(", ", addressFragment);
+        }
+
+        private IEnumerable<OrderItemSummary> MapOrderItems(Order orderDetails)
+        {
+            return orderDetails.Orderitems.Select(orderItem => new OrderItemSummary
+            {
+                Product = ResoveProductName(orderDetails, orderItem),
+                Quantity = orderItem.Quantity.GetValueOrDefault(),
+                PriceEach = CalculateUnitPrice(orderItem.Price.GetValueOrDefault(), orderItem.Quantity.GetValueOrDefault())
+            });
+        }
+
+        private decimal CalculateUnitPrice(decimal price, int quantity)
+        {
+            if (quantity == 0)
+            {
+                return default;
+            }
+
+            return Math.Round(price / quantity, 2, MidpointRounding.AwayFromZero);
+        }
+
+        private static string ResoveProductName(Order orderDetails, Orderitem orderItem)
+        {
+            return orderDetails.Containsgift.Value ? "Gift" : orderItem.Product.Productname;
         }
 
         private CustomerNames MapCustomerDetails(CustomerDetails customerDetails)
@@ -71,7 +120,7 @@ namespace Orders.Api.Services.Services.Implementations
 
         private void ThrowIfCustomerIdsDoNotMatch(string actualId, string requestedId, string email)
         {
-            if (actualId.Equals(requestedId, StringComparison.OrdinalIgnoreCase))
+            if (actualId != null && actualId.Equals(requestedId, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }                

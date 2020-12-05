@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Api.Repositories.Init;
 using Orders.Api.Services.Services.Implementations;
+using Orders.Api.Services.Services.Interfaces;
 
 namespace Orders.Api.Services.Init
 {
@@ -17,7 +18,7 @@ namespace Orders.Api.Services.Init
 
         private static void ConfigureTrackingService(IServiceCollection services)
         {
-            services.AddTransient<TrackingService, TrackingService>();
+            services.AddTransient<ITrackingService, TrackingService>();
         }
     }
 }

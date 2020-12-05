@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Orders.Api.Repositories.Models;
 using Orders.Api.Repositories.Repositories.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Orders.Api.Repositories.Repositories.Implementations
@@ -19,7 +21,12 @@ namespace Orders.Api.Repositories.Repositories.Implementations
 
         public Task<Order> GetOrdersByCustomerIdLastestOnlyAsync(string customerId)
         {
-            throw new NotImplementedException();
+            var order = _ordersDBContext.Orders
+                .Include(x=>x.Orderitems)
+                .ThenInclude(x=>x.Product)
+                .Where(x=>x.Customerid == customerId)
+                .OrderByDescending(x => x.Orderdate).FirstOrDefault();
+            return Task.FromResult(order);
         }
     }
 }

@@ -155,7 +155,7 @@ namespace Orders.Api.Tests.Orders.Api.Services.Tests.TrackingServiceTests
         }
 
         [Test]
-        public async Task GivenAnOrderIsFound_WhenOnceOfItsProductsIsAGift_ThenGiftShouldBeReturnedInTheProductName()
+        public async Task GivenAnOrderIsFound_WhenOneOfItsProductsIsAGift_ThenGiftShouldBeReturnedInTheProductName()
         {
             // Arrange
             const string customerId = "the expectedId";
@@ -189,6 +189,51 @@ namespace Orders.Api.Tests.Orders.Api.Services.Tests.TrackingServiceTests
 
             // Assert
             Assert.That(result.Order.OrderItems.All(x => x.Product == "Gift"), Is.True);
+        }
+
+        [Test]
+        public async Task GivenAnOrderIsFound_WhenProductIsReturned_ThenUnitPriceMustBeCalculated()
+        {
+            // Arrange
+            const string customerId = "the expectedId";
+            _ordersRepository
+                .Setup(x => x.GetOrdersByCustomerIdLastestOnlyAsync(It.IsAny<string>()))
+                .ReturnsAsync(new Order
+                {
+                    Containsgift = false,
+                    Orderitems = new[]
+                    {
+                        new Orderitem
+                        {
+                            Product = new Product
+                            {
+                                Productname = "p1"
+                            },
+                            Price = Convert.ToDecimal(10.57),
+                            Quantity = 3
+                        },
+                        new Orderitem
+                        {
+                            Product = new Product
+                            {
+                                Productname = "p2"
+                            },
+                            Price = Convert.ToDecimal(111.73),
+                            Quantity = 13
+                        },
+                    }
+                });
+            EnsureCustomer(customerId);
+
+            // Act
+            var result = await _objectUnderTest.GetLastOrderDeliveryDetails("someemail", customerId);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Order.OrderItems.First(x => x.Product == "p1").PriceEach, Is.EqualTo(3.52));
+                Assert.That(result.Order.OrderItems.First(x => x.Product == "p2").PriceEach, Is.EqualTo(8.59));
+            });
         }
 
         private void EnsureCustomer(string someid)
