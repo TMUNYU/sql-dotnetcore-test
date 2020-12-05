@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Orders.Api.Repositories.Models.Request
+﻿namespace Orders.Api.Repositories.Models.Request
 {
     public class CustomerDetailsRequestDto
     {

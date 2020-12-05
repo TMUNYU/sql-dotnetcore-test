@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Orders.Api.Repositories.Models;
 using Orders.Api.Repositories.Repositories.Interfaces;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 

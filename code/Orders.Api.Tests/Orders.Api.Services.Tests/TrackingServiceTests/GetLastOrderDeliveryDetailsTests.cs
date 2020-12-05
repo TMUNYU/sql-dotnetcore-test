@@ -6,10 +6,7 @@ using Orders.Api.Repositories.Repositories.Interfaces;
 using Orders.Api.Services.Exceptions;
 using Orders.Api.Services.Services.Implementations;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Orders.Api.Tests.Orders.Api.Services.Tests.TrackingServiceTests

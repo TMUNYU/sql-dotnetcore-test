@@ -5,8 +5,6 @@ using Orders.Api.Services.Exceptions;
 using Orders.Api.Services.Models.DomainModels;
 using Orders.Api.Services.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 

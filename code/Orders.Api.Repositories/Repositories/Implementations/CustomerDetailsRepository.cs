@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Orders.Api.Repositories.Models;
@@ -7,9 +6,7 @@ using Orders.Api.Repositories.Models.Configuration;
 using Orders.Api.Repositories.Models.Request;
 using Orders.Api.Repositories.Repositories.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Orders.Api.Repositories.Repositories.Implementations
