@@ -5,8 +5,10 @@ using NUnit.Framework;
 using Orders.Api.Controllers;
 using Orders.Api.Models.Dtos.Request;
 using Orders.Api.Models.Response;
+using Orders.Api.Services.Exceptions;
 using Orders.Api.Services.Models.DomainModels;
 using Orders.Api.Services.Services.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace Orders.Api.Tests.Orders.Api.Tests
@@ -14,25 +16,23 @@ namespace Orders.Api.Tests.Orders.Api.Tests
     [TestFixture]
     public class OrdersDetailsControllerTests
     {
-        private Mock<IOrderService> _orderService;
-        private Mock<ICustomerDetailsService> _customerDetailsService;
+        private Mock<ITrackingService> _trackingService;
 
         private OrdersDetailsController _objectUnderTest;
 
         [SetUp]
         public void Setup()
         {
-            _customerDetailsService = new Mock<ICustomerDetailsService>();
-            _orderService = new Mock<IOrderService>();
+            _trackingService = new Mock<ITrackingService>();
 
-            _objectUnderTest = new OrdersDetailsController(_orderService.Object, _customerDetailsService.Object, Mock.Of<ILogger<OrdersDetailsController>>());
+            _objectUnderTest = new OrdersDetailsController(_trackingService.Object, Mock.Of<ILogger<OrdersDetailsController>>());
         }
 
         [Test]
         public async Task GivenIdentityIsNull_WhenGetLatestOrderDetailsIsCalled_ThenBadRequestShouldReturnAsync()
         {
             // Act
-            var result = await _objectUnderTest.GetLatestOrderDetails(null);
+            var result = await _objectUnderTest.GetLatestOrderDetailsAsync(null);
 
             // Assert
             Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
@@ -45,7 +45,7 @@ namespace Orders.Api.Tests.Orders.Api.Tests
             _objectUnderTest.ModelState.AddModelError("Email", "isInvalid");
 
             // Act
-            var result = await _objectUnderTest.GetLatestOrderDetails(new CustomerIdentity());
+            var result = await _objectUnderTest.GetLatestOrderDetailsAsync(new CustomerIdentity());
 
             // Assert
             Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
@@ -62,70 +62,56 @@ namespace Orders.Api.Tests.Orders.Api.Tests
             };
 
             // Act
-            var result = await _objectUnderTest.GetLatestOrderDetails(identity);
+            var result = await _objectUnderTest.GetLatestOrderDetailsAsync(identity);
 
             // Assert
-            _customerDetailsService.Verify(x => x.GetCustomerDetailsByEmailAsync("this@email.com", "someid"));
+            _trackingService.Verify(x => x.GetLastOrderDeliveryDetails("this@email.com", "someid"));
         }
 
         [Test]
-        public async Task GivenCustomerDetailsServiceIsCalled_WhenNullReturns_Then400ShouldReturnAsync()
+        public async Task GivenGetLastOrderDeliveryDetailsIsCalled_WhenNullReturns_Then500ShouldReturnAsync()
         {
             // Arrange
-            _customerDetailsService
-                .Setup(x => x.GetCustomerDetailsByEmailAsync(It.IsAny<string>(), It.IsAny<string>()))
+            _trackingService
+                .Setup(x => x.GetLastOrderDeliveryDetails(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync((CustomerDetailsInfo)null);
 
             // Act
-            var result = await _objectUnderTest.GetLatestOrderDetails(new CustomerIdentity());
+            var result = await _objectUnderTest.GetLatestOrderDetailsAsync(new CustomerIdentity());
+
+            // Assert
+            Assert.That(((StatusCodeResult)result.Result).StatusCode, Is.EqualTo(500));
+        }
+
+        [Test]
+        public async Task GivenGetLastOrderDeliveryDetailsIsCalled_WhenCustomerIdentityInvalidExceptionIsThrown_ThenBadRequestShouldReturnAsync()
+        {
+            // Arrange
+            _trackingService
+                .Setup(x => x.GetLastOrderDeliveryDetails(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new CustomerIdentityInvalidException());
+
+            // Act
+            var result = await _objectUnderTest.GetLatestOrderDetailsAsync(new CustomerIdentity());
 
             // Assert
             Assert.That(result.Result, Is.InstanceOf<BadRequestResult>());
         }
 
-        [Test]
-        public async Task GivenUseIsFound_WhenGetOrderByEmailAsyncIsCalled_ThenBothTheIdAndEmailedFromIdentityShouldBePassed()
-        {
-            // Arrange
-            _customerDetailsService.Setup(x => x.GetCustomerDetailsByEmailAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new CustomerDetailsInfo());
-            var identity = new CustomerIdentity
-            {
-                User = "this@email.com",
-                CustomerId = "someid"
-            };
-
-            // Act
-            await _objectUnderTest.GetLatestOrderDetails(identity);
-
-            // Assert
-            _orderService.Verify(x => x.GetOrderByEmailAsync("this@email.com", "someid"));
-        }
 
         [Test]
-        public async Task GivenNoOrderWithGivenComboOfDetailsIsFound_WhenCustomerIsReturnFromCustomerService_ThenCustomerDetailsShouldReturnWithEmptyOrderArray()
+        public async Task GivenGetLastOrderDeliveryDetailsIsCalled_WhenAnyOtherExceptionIsThrown_Then500ReturnAsync()
         {
             // Arrange
-            _customerDetailsService
-                .Setup(x => x.GetCustomerDetailsByEmailAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new CustomerDetailsInfo() { 
-                    FirstName = "Josh",
-                    LastName = "Long"
-                });
-
-            _orderService
-                .Setup(x => x.GetOrderByEmailAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync((OrderInfo)null);
+            _trackingService
+                .Setup(x => x.GetLastOrderDeliveryDetails(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
 
             // Act
-            var result = (ActionResult<LatestOrderDto>)(await _objectUnderTest.GetLatestOrderDetails(new CustomerIdentity()));
+            var result = await _objectUnderTest.GetLatestOrderDetailsAsync(new CustomerIdentity());
 
             // Assert
-            Assert.Multiple(()=> {
-                Assert.That(result.Value.Order, Is.Null);  
-                Assert.That(result.Value.Customer.FirstName, Is.EqualTo("Josh"));  
-                Assert.That(result.Value.Customer.LastName, Is.EqualTo("Long"));  
-            });
-
+            Assert.That(((StatusCodeResult)result.Result).StatusCode, Is.EqualTo(500));
         }
     }
 }

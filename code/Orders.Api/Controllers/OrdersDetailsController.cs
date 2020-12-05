@@ -2,11 +2,13 @@
 using Microsoft.Extensions.Logging;
 using Orders.Api.Models.Dtos.Request;
 using Orders.Api.Models.Response;
+using Orders.Api.Services.Exceptions;
 using Orders.Api.Services.Models.DomainModels;
 using Orders.Api.Services.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Orders.Api.Controllers
@@ -15,35 +17,45 @@ namespace Orders.Api.Controllers
     [ApiController]
     public class OrdersDetailsController : Controller
     {
-        private readonly IOrderService _orderService;
-        private readonly ICustomerDetailsService _customerDetailsService;
+        private readonly ITrackingService _trackingService;
         private readonly ILogger<OrdersDetailsController> _logger;
 
-        public OrdersDetailsController(IOrderService orderService, ICustomerDetailsService customerDetailsService, ILogger<OrdersDetailsController> logger)
+        public OrdersDetailsController(ITrackingService trackingService, ILogger<OrdersDetailsController> logger)
         {
-            _orderService = orderService;
-            _customerDetailsService = customerDetailsService;
+            _trackingService = trackingService;
             _logger = logger;
         }
 
         [HttpPost("lastorder")]
-        public async Task<ActionResult<LatestOrderDto>> GetLatestOrderDetails(CustomerIdentity identity)
+        public async Task<ActionResult<LatestOrderDto>> GetLatestOrderDetailsAsync(CustomerIdentity identity)
         {
             if (identity == null || !ModelState.IsValid)
             {
                 return new BadRequestResult();
             }
 
-            var customer = await _customerDetailsService.GetCustomerDetailsByEmailAsync(identity.User, identity.CustomerId);
-
-            if (customer == null)
+            try
             {
+                var customer = await _trackingService.GetLastOrderDeliveryDetails(identity.User, identity.CustomerId);
+
+                if (customer == null)
+                {
+                    _logger.LogError("Tracking service unexpectedly returned null for user id {userId}.", identity.CustomerId);
+                    return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                }
+
+                return new OkObjectResult(customer);
+            }
+            catch(CustomerIdentityInvalidException ciie)
+            {
+                _logger.LogError(ciie, "Invalid user and customer id combination for user {userId} requested.", identity.CustomerId);
                 return new BadRequestResult();
             }
-
-            var orderDetails = await _orderService.GetOrderByEmailAsync(identity.User, identity.CustomerId);
-
-            return ConstructResponse(customer, orderDetails);
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve tracking information for user id {userId}.", identity.CustomerId);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }     
         }
 
         private ActionResult<LatestOrderDto> ConstructResponse(CustomerDetailsInfo customer, OrderInfo orderDetails)

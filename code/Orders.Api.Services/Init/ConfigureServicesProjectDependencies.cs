@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orders.Api.Repositories.Init;
 using Orders.Api.Services.Services.Implementations;
-using Orders.Api.Services.Services.Interfaces;
 
 namespace Orders.Api.Services.Init
 {
@@ -13,18 +12,12 @@ namespace Orders.Api.Services.Init
         {
             ConfigureRepositoriesProjectDependencies.Configure(services, configuration);
 
-            ConfigureCustomerDetailsService(services);
-            ConfigureOrdersService(services);
+            ConfigureTrackingService(services);
         }
 
-        private static void ConfigureOrdersService(IServiceCollection services)
+        private static void ConfigureTrackingService(IServiceCollection services)
         {
-            services.AddTransient<IOrderService, OrderService>();
-        }
-
-        private static void ConfigureCustomerDetailsService(IServiceCollection services)
-        {
-            services.AddTransient<ICustomerDetailsService, CustomerDetailsService>();
+            services.AddTransient<TrackingService, TrackingService>();
         }
     }
 }

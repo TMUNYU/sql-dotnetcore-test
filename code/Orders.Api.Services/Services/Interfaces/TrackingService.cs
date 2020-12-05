@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Orders.Api.Services.Services.Interfaces
 {
-    public interface IOrderService
+    public interface ITrackingService
     {
-        Task<OrderInfo> GetOrderByEmailAsync(string email, string customerId);
+        public Task<CustomerDetailsInfo> GetLastOrderDeliveryDetails(string email, string customerId);
     }
 }

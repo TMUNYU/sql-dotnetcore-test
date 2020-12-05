@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace Orders.Api.Services.Services.Implementations
 {
-    public class CustomerDetailsService: ICustomerDetailsService
+    public class TrackingService: Interfaces.ITrackingService
     {
         private readonly ICustomerDetailsRepository _customerDetailsRepository;
-        private readonly ILogger<CustomerDetailsService> _logger;
+        private readonly ILogger<TrackingService> _logger;
 
-        public CustomerDetailsService(ICustomerDetailsRepository customerDetailsRepository, ILogger<CustomerDetailsService> logger)
+        public TrackingService(ICustomerDetailsRepository customerDetailsRepository, ILogger<TrackingService> logger)
         {
             _customerDetailsRepository = customerDetailsRepository;
             _logger = logger;
         }
 
-        public Task<CustomerDetailsInfo> GetCustomerDetailsByEmailAsync(string email, string customerId)
+        public Task<CustomerDetailsInfo> GetLastOrderDeliveryDetails(string email, string customerId)
         {
             throw new NotImplementedException();
         }
