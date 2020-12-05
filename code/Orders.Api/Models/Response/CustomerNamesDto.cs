@@ -1,4 +1,5 @@
-namespace Orders.Api.Models{ 
+namespace Orders.Api.Models.Response
+{ 
 
     public class CustomerNamesDto    {
         public string FirstName { get; set; } 

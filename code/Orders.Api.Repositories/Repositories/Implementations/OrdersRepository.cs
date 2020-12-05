@@ -4,6 +4,7 @@ using Orders.Api.Repositories.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Orders.Api.Repositories.Repositories.Implementations
 {
@@ -18,7 +19,7 @@ namespace Orders.Api.Repositories.Repositories.Implementations
             _logger = logger;
         }
 
-        public IEnumerable<Order> GetOrdersByCustomerId(string customerId, Expression<Func<Order, bool>> predicate)
+        public Task<IEnumerable<Order>> GetOrdersByCustomerId(string customerId, Expression<Func<Order, bool>> predicate)
         {
             throw new NotImplementedException();
         }

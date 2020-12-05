@@ -5,6 +5,7 @@ using Orders.Api.Repositories.Models.Configuration;
 using Orders.Api.Repositories.Repositories.Interfaces;
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Orders.Api.Repositories.Repositories.Implementations
 {
@@ -19,7 +20,7 @@ namespace Orders.Api.Repositories.Repositories.Implementations
             _apiConfiguration = apiConfiguration.Value;
         }
 
-        public CustomerDetails GetCustomerDetailsByEmail(string email)
+        public Task<CustomerDetails> GetCustomerDetailsByEmail(string email)
         {
             throw new NotImplementedException();
         }

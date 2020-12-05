@@ -1,9 +1,10 @@
 ﻿using Orders.Api.Repositories.Models;
+using System.Threading.Tasks;
 
 namespace Orders.Api.Repositories.Repositories.Interfaces
 {
     public interface ICustomerDetailsRepository
     {
-        CustomerDetails GetCustomerDetailsByEmail(string email);
+        Task<CustomerDetails> GetCustomerDetailsByEmail(string email);
     }
 }

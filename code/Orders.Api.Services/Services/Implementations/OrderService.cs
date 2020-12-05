@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Orders.Api.Repositories.Repositories.Interfaces;
 using Orders.Api.Services.Models.DomainModels;
@@ -17,7 +18,7 @@ namespace Orders.Api.Services.Services.Implementations
             _logger = logger;
         }
 
-        public CustomerDetailsInfo GetCustomerDetails(string email)
+        public Task<OrderInfo> GetOrderByEmailAsync(string email, string customerId)
         {
             throw new NotImplementedException();
         }

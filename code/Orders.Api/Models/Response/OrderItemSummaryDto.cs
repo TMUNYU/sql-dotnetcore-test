@@ -1,9 +1,10 @@
-namespace Orders.Api.Models{ 
+namespace Orders.Api.Models.Response
+{ 
 
     public class OrderItemSummaryDto    {
         public string Product { get; set; } 
         public int Quantity { get; set; } 
-        public double PriceEach { get; set; } 
+        public decimal PriceEach { get; set; } 
     }
 
 }

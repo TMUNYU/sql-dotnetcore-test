@@ -15,9 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Orders.Api.Tests\" />
     <Folder Include="Orders.Api.Services.Tests\" />
     <Folder Include="Orders.Api.Repositories.Tests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Orders.Api.Services\Orders.Api.Services.csproj" />
+    <ProjectReference Include="..\Orders.Api\Orders.Api.csproj" />
   </ItemGroup>
 
 </Project>
