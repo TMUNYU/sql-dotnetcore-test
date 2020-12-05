@@ -1,7 +1,7 @@
-namespace Orders.Api.Models.Response
+namespace Orders.Api.Services.Models.DomainModels
 { 
 
-    public class OrderItemSummaryDto    {
+    public class OrderItemSummary    {
         public string Product { get; set; } 
         public int Quantity { get; set; } 
         public decimal PriceEach { get; set; } 

@@ -5,6 +5,6 @@ namespace Orders.Api.Services.Services.Interfaces
 {
     public interface ITrackingService
     {
-        public Task<CustomerDetailsInfo> GetLastOrderDeliveryDetails(string email, string customerId);
+        public Task<LatestOrderInfo> GetLastOrderDeliveryDetails(string email, string customerId);
     }
 }

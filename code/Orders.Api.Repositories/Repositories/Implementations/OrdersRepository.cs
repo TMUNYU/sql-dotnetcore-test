@@ -2,8 +2,6 @@
 using Orders.Api.Repositories.Models;
 using Orders.Api.Repositories.Repositories.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Orders.Api.Repositories.Repositories.Implementations
@@ -19,7 +17,7 @@ namespace Orders.Api.Repositories.Repositories.Implementations
             _logger = logger;
         }
 
-        public Task<IEnumerable<Order>> GetOrdersByCustomerId(string customerId, Expression<Func<Order, bool>> predicate)
+        public Task<Order> GetOrdersByCustomerIdLastestOnlyAsync(string customerId)
         {
             throw new NotImplementedException();
         }

@@ -4,7 +4,6 @@ using Moq;
 using NUnit.Framework;
 using Orders.Api.Controllers;
 using Orders.Api.Models.Dtos.Request;
-using Orders.Api.Models.Response;
 using Orders.Api.Services.Exceptions;
 using Orders.Api.Services.Models.DomainModels;
 using Orders.Api.Services.Services.Interfaces;
@@ -74,7 +73,7 @@ namespace Orders.Api.Tests.Orders.Api.Tests
             // Arrange
             _trackingService
                 .Setup(x => x.GetLastOrderDeliveryDetails(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync((CustomerDetailsInfo)null);
+                .ReturnsAsync((LatestOrderInfo)null);
 
             // Act
             var result = await _objectUnderTest.GetLatestOrderDetailsAsync(new CustomerIdentity());

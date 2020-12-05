@@ -20,7 +20,7 @@ namespace Orders.Api.Repositories.Repositories.Implementations
             _apiConfiguration = apiConfiguration.Value;
         }
 
-        public Task<CustomerDetails> GetCustomerDetailsByEmail(string email)
+        public Task<CustomerDetails> GetCustomerDetailsByEmailAsync(string email)
         {
             throw new NotImplementedException();
         }

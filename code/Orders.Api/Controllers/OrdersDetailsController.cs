@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Orders.Api.Models.Dtos.Request;
-using Orders.Api.Models.Response;
 using Orders.Api.Services.Exceptions;
 using Orders.Api.Services.Models.DomainModels;
 using Orders.Api.Services.Services.Interfaces;
@@ -27,7 +26,7 @@ namespace Orders.Api.Controllers
         }
 
         [HttpPost("lastorder")]
-        public async Task<ActionResult<LatestOrderDto>> GetLatestOrderDetailsAsync(CustomerIdentity identity)
+        public async Task<ActionResult<LatestOrderInfo>> GetLatestOrderDetailsAsync(CustomerIdentity identity)
         {
             if (identity == null || !ModelState.IsValid)
             {
@@ -58,61 +57,61 @@ namespace Orders.Api.Controllers
             }     
         }
 
-        private ActionResult<LatestOrderDto> ConstructResponse(CustomerDetailsInfo customer, OrderInfo orderDetails)
-        {
-            return new LatestOrderDto
-            {
-                Customer = ConstructCustomer(customer),
-                Order = ConstructOrders(orderDetails, customer)
-            };
-        }
+        //private ActionResult<LatestOrderInfo> ConstructResponse(CustomerDetailsInfo customer, OrderInfo orderDetails)
+        //{
+        //    return new LatestOrderInfo
+        //    {
+        //        Customer = ConstructCustomer(customer),
+        //        Order = ConstructOrders(orderDetails, customer)
+        //    };
+        //}
 
-        private OrderSummaryDto ConstructOrders(OrderInfo orderDetails, CustomerDetailsInfo customer)
-        {
-            if (orderDetails == null)
-            {
-                return null;
-            }
+        //private OrderSummary ConstructOrders(OrderInfo orderDetails, CustomerDetailsInfo customer)
+        //{
+        //    if (orderDetails == null)
+        //    {
+        //        return null;
+        //    }
 
-            return new OrderSummaryDto
-            {
-                DeliveryAddress = ConstructAddress(customer),
-                DeliveryExpected = (orderDetails.DeliveryExpected?.ToString("dd-MM-yyyy")) ?? "Not known",
-                OrderDate = orderDetails.OrderDate.ToString("dd-MM-yyyy"),
-                OrderItems = ConstructOrderItems(orderDetails.OrderItems),
-                OrderNumber = orderDetails.OrderId
-            };
-        }
+        //    return new OrderSummary
+        //    {
+        //        DeliveryAddress = ConstructAddress(customer),
+        //        DeliveryExpected = (orderDetails.DeliveryExpected?.ToString("dd-MM-yyyy")) ?? "Not known",
+        //        OrderDate = orderDetails.OrderDate.ToString("dd-MM-yyyy"),
+        //        OrderItems = ConstructOrderItems(orderDetails.OrderItems),
+        //        OrderNumber = orderDetails.OrderId
+        //    };
+        //}
 
-        private IEnumerable<OrderItemSummaryDto> ConstructOrderItems(IEnumerable<OrderItemInfo> orderItems)
-        {
-            return orderItems.Select(x => new OrderItemSummaryDto
-            {
-                PriceEach = x.UnitPrice,
-                Quantity = x.Quantity,
-                Product = x.Product.ProductName
-            });
-        }
+        //private IEnumerable<OrderItemSummary> ConstructOrderItems(IEnumerable<OrderItemInfo> orderItems)
+        //{
+        //    return orderItems.Select(x => new OrderItemSummary
+        //    {
+        //        PriceEach = x.UnitPrice,
+        //        Quantity = x.Quantity,
+        //        Product = x.Product.ProductName
+        //    });
+        //}
 
-        private string ConstructAddress(CustomerDetailsInfo customer)
-        {
-            var addressFragments = new[] {
-                customer.HouseNumber,
-                customer.Street,
-                customer.Town,
-                customer.Postcode
-            }.Where(x=>!string.IsNullOrWhiteSpace(x));
+        //private string ConstructAddress(CustomerDetailsInfo customer)
+        //{
+        //    var addressFragments = new[] {
+        //        customer.HouseNumber,
+        //        customer.Street,
+        //        customer.Town,
+        //        customer.Postcode
+        //    }.Where(x=>!string.IsNullOrWhiteSpace(x));
 
-            return string.Join(",", addressFragments);
-        }
+        //    return string.Join(",", addressFragments);
+        //}
 
-        private CustomerNamesDto ConstructCustomer(CustomerDetailsInfo customer)
-        {
-            return new CustomerNamesDto
-            {
-                FirstName = customer.FirstName,
-                LastName = customer.LastName
-            };
-        }
+        //private CustomerNames ConstructCustomer(CustomerDetailsInfo customer)
+        //{
+        //    return new CustomerNames
+        //    {
+        //        FirstName = customer.FirstName,
+        //        LastName = customer.LastName
+        //    };
+        //}
     }
 }

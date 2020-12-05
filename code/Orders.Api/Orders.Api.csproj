@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Folder Include="Init\" />
+    <Folder Include="Models\Response\" />
   </ItemGroup>
 
   <ItemGroup>

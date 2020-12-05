@@ -8,6 +8,6 @@ namespace Orders.Api.Repositories.Repositories.Interfaces
 {
     public interface IOrdersRepository
     {
-        Task<IEnumerable<Order>> GetOrdersByCustomerId(string customerId, Expression<Func<Order, bool>> predicate);
+        Task<Order> GetOrdersByCustomerIdLastestOnlyAsync(string customerId);
     }
 }

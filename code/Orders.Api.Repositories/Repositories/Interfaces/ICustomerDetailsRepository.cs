@@ -5,6 +5,6 @@ namespace Orders.Api.Repositories.Repositories.Interfaces
 {
     public interface ICustomerDetailsRepository
     {
-        Task<CustomerDetails> GetCustomerDetailsByEmail(string email);
+        Task<CustomerDetails> GetCustomerDetailsByEmailAsync(string email);
     }
 }
